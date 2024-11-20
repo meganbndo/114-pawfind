@@ -1,0 +1,190 @@
+/* src/components/RegisterForm.css */
+.clinic-signup {
+  padding: 40px;
+  background: linear-gradient(135deg, #87CEEB 60%, white 40%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  min-width: 140px;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+
+h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+  font-family: 'Anton', sans-serif;
+}
+
+.form-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.clinic-name-container {
+  width: 100%;
+  max-width: 1200px;
+  height: 60px;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.clinic-name-input {
+  width: 100%;
+  height: 100%;
+  font-size: 24px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  text-align: center;
+  color: #808080;
+}
+
+.hours-container {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 20px;
+}
+
+.opening-days-selector,
+.opening-hours-selector {
+  background: white;
+  border-radius: 8px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  flex: 1;
+  border: 1px solid #ccc;
+}
+
+.opening-days-selector span,
+.opening-hours-selector span {
+  font-size: 20px;
+  color: #808080;
+  margin-right: 60px;
+  margin-left: 20px;
+}
+
+.dropdown {
+  font-size: 18px;
+  color: #808080;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  background: transparent;
+  padding: 5px;
+  margin-left: 5px;
+  width: 100%;
+  height: 40px;
+  overflow-y: auto;
+}
+
+.dropdown option {
+  height: 50px;
+}
+
+.address-section h2,
+.services-section h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.address-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.address-inputs input {
+  height: 60px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0 15px;
+  font-size: 18px;
+  color: #808080;
+}
+
+.province-input {
+  width: 25%;
+}
+
+.barangay-input {
+  width: 20%;
+}
+
+.city-input {
+  width: 45%;
+}
+
+.zip-input {
+  width: 10%;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.service-item {
+  background: #E8E8E8;
+  /* padding: 15px; */
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: 1px solid #ccc;
+}
+
+.service-item input[type="checkbox"] {
+  display: none;
+}
+
+.service-item input[type="checkbox"]:checked + label {
+  background-color: #063e54; /* Change color when selected */
+  border-radius: 5px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.service-item label {
+  font-size: 16px;
+  color: #333;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 15px; /* Maintain original padding */
+  box-sizing: border-box; /* Include padding in size */
+}
+
+.next-button {
+  width: 200px;
+  height: 60px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-family: 'Aleo', sans-serif;
+  font-size: 24px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  transition: background-color 0.3s ease;
+}
+
+.next-button:hover {
+  background-color: #333;
+}
