@@ -1,0 +1,139 @@
+{
+  "profiles": [
+    {
+      "clinic_id": "1",
+      "profile_pic": "src/components/pictures/dokhayop.jpg",
+      "clinic_name": "Dok Hayop Dog Spa & Animal Clinic",
+      "bio": "Butuan City's premier grooming salon, top-notch veterinary service, and cozy pet hotel for dogs and cats. Trust us to provide exceptional care and a loving environment for your furry family members.",
+      "barangay": "Poblacion 1",
+      "province": "Agusan del Norte",
+      "city": "Remedios T. Ramualdez",
+      "zip_code": "8611",
+      "open_time": "8 am",
+      "close_time": "5 pm",
+      "open_day": "Monday",
+      "close_day": "Saturday",
+      "services": "Rehabilitation and Physical Therapy, Pet Boarding and Daycare"
+    }
+  ],
+  "clinics": [],
+  "appointments": [
+    {
+      "id": "1",
+      "date": "2023-10-02",
+      "time": "7:00 - 7:10",
+      "furparent": "Lance Meting",
+      "type": "Dog",
+      "furpatient": "Arrow Meting",
+      "additionals": [
+        {
+          "status": "Ongoing",
+          "actions": "Pending"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "date": "2023-10-02",
+      "time": "8:20 - 8:30",
+      "furparent": "Carter Smith",
+      "type": "Dog",
+      "furpatient": "Browny Smith",
+      "additionals": [
+        {
+          "status": "Ongoing",
+          "actions": "Pending"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "date": "2024-10-03",
+      "time": "9:00 - 9:10",
+      "furparent": "John Doe",
+      "type": "Cat",
+      "furpatient": "Whiskers Doe",
+      "additionals": [
+        {
+          "status": "Ongoing",
+          "actions": "Pending"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "date": "2024-10-03",
+      "time": "9:20 - 9:30",
+      "furparent": "Lilibeth Salazar",
+      "type": "Dog",
+      "furpatient": "Lily Salazar",
+      "additionals": [
+        {
+          "status": "Ongoing",
+          "actions": "Pending"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "date": "2024-10-03",
+      "time": "9:40 - 9:50",
+      "furparent": "Moby Yahoo",
+      "type": "Cat",
+      "furpatient": "Mingay Yahoo",
+      "additionals": [
+        {
+          "status": "Ongoing",
+          "actions": "Pending"
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "date": "2024-11-24",
+      "time": "10:00 - 10:30",
+      "furparent": "Frank Ocean",
+      "type": "Dog",
+      "furpatient": "Sea Ocean",
+      "additionals": [
+        {
+          "status": "Noted",
+          "actions": "COMPLETED"
+        }
+      ]
+    }
+  ],
+  "patients": [
+    {
+      "id": "1",
+      "name": "Arrow Meting",
+      "age": "2y 11m",
+      "breed": "Siberian Husky",
+      "gender": "male",
+      "image": "src/components/patient list/arrow.jpg",
+      "height": "42 cm",
+      "weight": "15.5 kg",
+      "color": "Black and White",
+      "history": [
+        {
+          "purpose": "TEST 2",
+          "date": "11/24/2024",
+          "files": [
+            {
+              "name": "Data Mining Activity (Megan Binondo).pdf",
+              "type": "application/pdf",
+              "url": "blob:http://localhost:5173/a6b11b68-fdc8-453f-9181-22af7003ff8e",
+              "thumbnail": "src/components/pictures/PDF-icon.png"
+            },
+            {
+              "name": "330px-Persialainen.jpg",
+              "type": "image/jpeg",
+              "url": "blob:http://localhost:5173/522deca3-6c9c-47d0-b9ed-aece4a916f33",
+              "thumbnail": "blob:http://localhost:5173/bd54af78-9df3-44c3-af52-b783d105bde0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

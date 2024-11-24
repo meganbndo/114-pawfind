@@ -1,13 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import ClinicHistory from './ClinicHistory';
 import './Patients.css';
 
 const Patients = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  const [clinicSearchQuery, setClinicSearchQuery] = useState('');
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [viewClinicHistory, setViewClinicHistory] = useState(false);
+  const [patients, setPatients] = useState([]);
   const patientsPerPage = 10;
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/patients');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setPatients(data);
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+      }
+    };
+
+    fetchPatients();
+  }, []);
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -18,17 +39,50 @@ const Patients = () => {
     setCurrentPage(1);
   };
 
-  const handlePatientClick = (patient) => {
-    setSelectedPatient(patient);
+  const handleClinicSearchChange = (event) => {
+    setClinicSearchQuery(event.target.value);
   };
 
-  const patients = [
-    { name: 'Arrow Meting', age: '2y 11m', breed: 'Siberian Husky', gender: 'male', image: 'src\components\patient list\arrow.jpg', height: '42 cm', weight: '15.5 kg', color: 'Black and White' },
-    { name: 'Browny Smith', age: '2 years', breed: 'Golden Retriever', gender: 'male', image: 'src\components\patient list\browny.jpeg', height: '50 cm', weight: '20 kg', color: 'Golden' },
-    { name: 'Whiskers Doe', age: '1 year', breed: 'Persian Cat', gender: 'female', image: 'src\components\patient list\whiskers.jpg', height: '30 cm', weight: '5 kg', color: 'White' },
-    { name: 'Arrow Meting', age: '2y 11m', breed: 'Siberian Husky', gender: 'male', image: 'src\components\patient list\arrow.jpg', height: '42 cm', weight: '15.5 kg', color: 'Black and White' },
-    // Add more patients as needed
-  ];
+  const handlePatientClick = (patient) => {
+    setSelectedPatient(patient);
+    setViewClinicHistory(false);
+  };
+
+  const handleClinicHistoryClick = () => {
+    setViewClinicHistory(true);
+  };
+
+  const handleBackClick = () => {
+    if (viewClinicHistory) {
+      setViewClinicHistory(false);
+    } else {
+      setSelectedPatient(null);
+    }
+  };
+
+  const handleUpdateHistory = async (updatedHistory) => {
+    if (selectedPatient) {
+      try {
+        const response = await fetch(`http://localhost:3001/patients/${selectedPatient.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ history: updatedHistory }),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to update patient history');
+        }
+        const updatedPatients = patients.map(patient =>
+          patient.id === selectedPatient.id ? { ...patient, history: updatedHistory } : patient
+        );
+        setPatients(updatedPatients);
+        setSelectedPatient({ ...selectedPatient, history: updatedHistory });
+      } catch (error) {
+        console.error('Error updating patient history:', error);
+      }
+    }
+  };
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -38,8 +92,6 @@ const Patients = () => {
   const indexOfLastPatient = currentPage * patientsPerPage;
   const indexOfFirstPatient = indexOfLastPatient - patientsPerPage;
   const currentPatients = filteredPatients.slice(indexOfFirstPatient, indexOfLastPatient);
-
-  const totalPages = Math.ceil(filteredPatients.length / patientsPerPage);
 
   return (
     <section id="hero" className="hero section">
@@ -66,7 +118,7 @@ const Patients = () => {
               {dropdownOpen && (
                 <div className="dropdown-menu">
                   <ul>
-                    <li><a href="#profile">My Profile</a></li>
+                    <li><a href="/profile">My Profile</a></li>
                     <li><a href="#logout">Logout</a></li>
                   </ul>
                 </div>
@@ -78,23 +130,43 @@ const Patients = () => {
 
       <div className="patients-container">
         <div className="page-header d-flex align-items-center justify-content-between">
-          <h2>Patients 🐾</h2>
-          <div className="patient-search-filters d-flex align-items-center">
-            <div className="patient-search-bar d-flex align-items-center">
-              <img src="src\components\pictures\search-icon.png" alt="Search Icon" className="patient-search-icon" />
-              <input
-                type="text"
-                placeholder="Search patients..."
-                className="patient-search-input"
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
+          <h2>
+            {viewClinicHistory && selectedPatient ? `${selectedPatient.name}'s Clinic History` : 'Patients 🐾'}
+          </h2>
+          {!selectedPatient && !viewClinicHistory && (
+            <div className="patient-search-filters d-flex align-items-center">
+              <div className="patient-search-bar d-flex align-items-center">
+                <img src="src\components\pictures\search-icon.png" alt="Search Icon" className="patient-search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search patients..."
+                  className="patient-search-input"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </div>
             </div>
-          </div>
+          )}
+          {viewClinicHistory && (
+            <input
+              type="text"
+              placeholder="Search Clinic History"
+              className="search-bar"
+              value={clinicSearchQuery}
+              onChange={handleClinicSearchChange}
+            />
+          )}
         </div>
 
         <div className={`patient-box ${currentPatients.length <= 6 ? 'no-scroll' : ''}`}>
-          {selectedPatient ? (
+          {selectedPatient && viewClinicHistory ? (
+            <ClinicHistory
+              patientId={selectedPatient.id}
+              history={selectedPatient.history}
+              searchQuery={clinicSearchQuery}
+              onUpdateHistory={handleUpdateHistory}
+            />
+          ) : selectedPatient ? (
             <div className="patient-details">
               <div className="patient-image-container">
                 <img src={selectedPatient.image} alt={selectedPatient.name} className="patient-image-large" />
@@ -165,8 +237,10 @@ const Patients = () => {
         </div>
         {selectedPatient && (
           <div className="button-group">
-            <button className="back-button" onClick={() => setSelectedPatient(null)}>Back</button>
-            <button className="clinic-history-button">Clinic History</button>
+            <button className="back-button" onClick={handleBackClick}>Back</button>
+            {!viewClinicHistory && (
+              <button className="clinic-history-button" onClick={handleClinicHistoryClick}>Clinic History</button>
+            )}
           </div>
         )}
       </div>

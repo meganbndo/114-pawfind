@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; 
 import './Appointments.css';
 
 const Appointments = () => {
+  const [appointments, setAppointments] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -10,17 +11,26 @@ const Appointments = () => {
   const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]); // Initialize with today's date
   const appointmentsPerPage = 7;
 
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/appointments');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setAppointments(data);
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
-
-  // Example data with initial actions set to 'Pending'
-  const [appointments, setAppointments] = useState([
-    { date: '2024-10-02', time: '7:00 - 7:10', furparent: 'Lance Meting', type: 'Dog', furpatient: 'Arrow Meting', status: 'Ongoing', actions: 'Pending' },
-    { date: '2024-10-02', time: '8:20 - 8:30', furparent: 'Carter Smith', type: 'Dog', furpatient: 'Browny Smith', status: 'Ongoing', actions: 'Pending' },
-    { date: '2024-10-03', time: '9:00 - 9:10', furparent: 'John Doe', type: 'Cat', furpatient: 'Whiskers Doe', status: 'Ongoing', actions: 'Pending' },
-    // Add more data as needed
-  ]);
 
   // Format date to a readable string
   const formatDate = (date) => {
@@ -33,10 +43,10 @@ const Appointments = () => {
     const matchesDate = appointment.date === currentDate;
     const matchesSearchQuery = appointment.furparent.toLowerCase().includes(searchQuery.toLowerCase()) ||
       appointment.furpatient.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      appointment.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      appointment.status.toLowerCase().includes(searchQuery.toLowerCase());
+      appointment.type.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesHideNoted = hideNoted ? appointment.status.toLowerCase() !== 'noted' : true;
+    const status = appointment.additionals[0].status.toLowerCase();
+    const matchesHideNoted = hideNoted ? status !== 'noted' : true;
 
     return matchesDate && matchesSearchQuery && matchesHideNoted;
   });
@@ -82,11 +92,26 @@ const Appointments = () => {
   };
 
   // Handle status change to "Noted" or "Cancelled"
-  const handleStatusChange = (index, newStatus) => {
-    const updatedAppointments = [...appointments];
-    updatedAppointments[index].status = newStatus;
-    updatedAppointments[index].actions = newStatus === 'Noted' ? 'COMPLETED' : 'CANCELLED';
-    setAppointments(updatedAppointments);
+  const handleStatusChange = async (id, newStatus) => {
+    const newAction = newStatus === 'Noted' ? 'COMPLETED' : 'CANCELLED';
+    try {
+      const response = await fetch(`http://localhost:3001/appointments/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ additionals: [{ status: newStatus, actions: newAction }] }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update appointment');
+      }
+      const updatedAppointments = appointments.map(appointment =>
+        appointment.id === id ? { ...appointment, additionals: [{ status: newStatus, actions: newAction }] } : appointment
+      );
+      setAppointments(updatedAppointments);
+    } catch (error) {
+      console.error('Error updating appointment:', error);
+    }
   };
 
   return (
@@ -101,7 +126,7 @@ const Appointments = () => {
           <div className="header-container container-fluid container-xl d-flex align-items-center justify-content-between">
             <nav id="navmenu" className="navmenu">
               <ul className="d-flex align-items-center">
-              <li><Link to="/appointments" className="active">Appointments</Link></li>
+                <li><Link to="/appointments" className="active">Appointments</Link></li>
                 <li><Link to="/patients">Patients</Link></li>
               </ul>
             </nav>
@@ -116,8 +141,7 @@ const Appointments = () => {
               {dropdownOpen && (
                 <div className="dropdown-menu">
                   <ul>
-                    <li><a href="#profile">My Profile</a></li>
-                    <li><a href="#settings">Settings</a></li>
+                    <li><a href="/profile">My Profile</a></li>
                     <li><a href="#logout">Logout</a></li>
                   </ul>
                 </div>
@@ -182,20 +206,20 @@ const Appointments = () => {
           </thead>
           <tbody>
             {currentAppointments.length > 0 ? (
-              currentAppointments.map((appointment, index) => (
-                <tr key={index}>
+              currentAppointments.map((appointment) => (
+                <tr key={appointment.id}>
                   <td>{appointment.time}</td>
                   <td>{appointment.furparent}</td>
                   <td>{appointment.type}</td>
                   <td>{appointment.furpatient}</td>
-                  <td><span className={`status-badge ${appointment.status.toLowerCase()}`}>{appointment.status}</span></td>
+                  <td><span className={`status-badge ${appointment.additionals[0].status.toLowerCase()}`}>{appointment.additionals[0].status}</span></td>
                   <td className="actions">
-                    {appointment.actions === 'COMPLETED' || appointment.actions === 'CANCELLED' ? (
-                      <span className={`status-${appointment.actions.toLowerCase()}`}>{appointment.actions}</span>
+                    {appointment.additionals[0].actions === 'COMPLETED' || appointment.additionals[0].actions === 'CANCELLED' ? (
+                      <span className={`status-${appointment.additionals[0].actions.toLowerCase()}`}>{appointment.additionals[0].actions}</span>
                     ) : (
                       <>
-                        <button className="action-btn complete-btn" onClick={() => handleStatusChange(index, 'Noted')}>Complete</button>
-                        <button className="action-btn cancel-btn" onClick={() => handleStatusChange(index, 'Cancelled')}>Cancel</button>
+                        <button className="action-btn complete-btn" onClick={() => handleStatusChange(appointment.id, 'Noted')}>Complete</button>
+                        <button className="action-btn cancel-btn" onClick={() => handleStatusChange(appointment.id, 'Cancelled')}>Cancel</button>
                       </>
                     )}
                   </td>

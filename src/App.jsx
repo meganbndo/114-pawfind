@@ -1,28 +1,23 @@
 // src/App.jsx
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import RegisterForm from './components/RegisterForm';
 import DocumentUpload from './components/DocumentUpload';
 import Appointments from './components/Appointments';
-import Patients from './components/Patients'; // Import the Patients component
+import Patients from './components/Patients';
+import Profile from './components/Profile';
 
 function App() {
-  const [showDocumentUpload, setShowDocumentUpload] = useState(false);
-
   return (
     <Router>
       <div>
         <Routes>
-          <Route path="/" element={
-            showDocumentUpload ? (
-              <DocumentUpload onBack={() => setShowDocumentUpload(false)} />
-            ) : (
-              <RegisterForm onNext={() => setShowDocumentUpload(true)} />
-            )
-          } />
+          {/* <Route path="/" element={<RegisterForm />} />
+          <Route path="/document-upload" element={<DocumentUpload />} /> */}
           <Route path="/appointments" element={<Appointments />} />
-          <Route path="/patients" element={<Patients />} /> {/* Ensure this route is defined */}
+          <Route path="/patients" element={<Patients />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </Router>

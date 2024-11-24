@@ -1,8 +1,20 @@
+// src/components/RegisterForm.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import './RegisterForm.css';
 
-function RegisterForm({ onNext }) {
+function RegisterForm() {
+  const navigate = useNavigate(); // Initialize the navigate function
   const [selectedServices, setSelectedServices] = useState({});
+  const [clinicName, setClinicName] = useState('');
+  const [openingDays, setOpeningDays] = useState({ start: '', end: '' });
+  const [openingHours, setOpeningHours] = useState({ open: '', close: '' });
+  const [address, setAddress] = useState({
+    barangay: '',
+    city: '',
+    province: '',
+    zip: ''
+  });
 
   const services = [
     'General Check-Up and Wellness Exams',
@@ -32,6 +44,47 @@ function RegisterForm({ onNext }) {
     '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM', '10:00 PM', '11:00 PM'
   ];
 
+  const handleNext = () => {
+    const formData = {
+      clinicName,
+      openingDays,
+      openingHours,
+      address,
+      selectedServices: Object.keys(selectedServices).filter(service => selectedServices[service])
+    };
+
+    console.log('Submitting form data:', formData);
+
+    // Validate form data before sending
+    if (!clinicName || !openingDays.start || !openingDays.end || !openingHours.open || !openingHours.close || !address.barangay || !address.city || !address.province || !address.zip) {
+      alert('Please fill out all fields.');
+      return;
+    }
+
+    // POST request to save formData to the JSON server
+    fetch('http://localhost:3000/clinics', { // Assuming the endpoint is /clinics
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => {
+      console.log('Response status:', response.status);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Success:', data);
+      navigate('/document-upload'); // Navigate to the DocumentUpload page
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  };
+
   return (
     <div className="clinic-signup">
       <h1>Continue Signing Up</h1>
@@ -42,13 +95,19 @@ function RegisterForm({ onNext }) {
             type="text" 
             className="clinic-name-input" 
             placeholder="Clinic Name" 
+            value={clinicName}
+            onChange={(e) => setClinicName(e.target.value)}
           />
         </div>
         
         <div className="hours-container">  
           <div className="opening-days-selector">
             <span>Opening Days</span>
-            <select className="dropdown">
+            <select 
+              className="dropdown" 
+              value={openingDays.start} 
+              onChange={(e) => setOpeningDays({ ...openingDays, start: e.target.value })}
+            >
               <option>Select</option>
               <option>Monday</option>
               <option>Tuesday</option>
@@ -58,7 +117,11 @@ function RegisterForm({ onNext }) {
               <option>Saturday</option>
               <option>Sunday</option>
             </select>
-            <select className="dropdown">
+            <select 
+              className="dropdown" 
+              value={openingDays.end} 
+              onChange={(e) => setOpeningDays({ ...openingDays, end: e.target.value })}
+            >
               <option>Select</option>
               <option>Monday</option>
               <option>Tuesday</option>
@@ -71,13 +134,21 @@ function RegisterForm({ onNext }) {
           </div>
           <div className="opening-hours-selector">
             <span>Opening Hours</span>
-            <select className="dropdown">
+            <select 
+              className="dropdown" 
+              value={openingHours.open} 
+              onChange={(e) => setOpeningHours({ ...openingHours, open: e.target.value })}
+            >
               <option>Open</option>
               {times.map((time) => (
                 <option key={time}>{time}</option>
               ))}
             </select>
-            <select className="dropdown">
+            <select 
+              className="dropdown" 
+              value={openingHours.close} 
+              onChange={(e) => setOpeningHours({ ...openingHours, close: e.target.value })}
+            >
               <option>Close</option>
               {times.map((time) => (
                 <option key={time}>{time}</option>
@@ -89,10 +160,34 @@ function RegisterForm({ onNext }) {
         <div className="address-section">
           <h2>Address:</h2>
           <div className="address-inputs">
-            <input type="text" placeholder="Barangay" className="barangay-input" />
-            <input type="text" placeholder="Municipality / City" className="city-input" />
-            <input type="text" placeholder="Province" className="province-input" />
-            <input type="text" placeholder="Zip Code" className="zip-input" />
+            <input 
+              type="text" 
+              placeholder="Barangay" 
+              className="barangay-input" 
+              value={address.barangay}
+              onChange={(e) => setAddress({ ...address, barangay: e.target.value })}
+            />
+            <input 
+              type="text" 
+              placeholder="Municipality / City" 
+              className="city-input" 
+              value={address.city}
+              onChange={(e) => setAddress({ ...address, city: e.target.value })}
+            />
+            <input 
+              type="text" 
+              placeholder="Province" 
+              className="province-input" 
+              value={address.province}
+              onChange={(e) => setAddress({ ...address, province: e.target.value })}
+            />
+            <input 
+              type="text" 
+              placeholder="Zip Code" 
+              className="zip-input" 
+              value={address.zip}
+              onChange={(e) => setAddress({ ...address, zip: e.target.value })}
+            />
           </div>
         </div>
 
@@ -116,7 +211,7 @@ function RegisterForm({ onNext }) {
           </div>
         </div>
 
-        <button className="next-button" onClick={onNext}>Next</button>
+        <button className="next-button" onClick={handleNext}>Next</button>
       </div>
     </div>
   );
